@@ -25,7 +25,7 @@ class Home extends Component {
     });
   }
 
-  recipes() {
+  contentTypes() {
     return Object.keys(this.props.contentTypes).map(key => this.props.contentTypes[key]);
   }
 
@@ -35,20 +35,20 @@ class Home extends Component {
         <View style={styles.searchSection}>
           <TextInput style={styles.searchInput}
             returnKeyType="search"
-            placeholder="Ingredients (comma delimited)"
+            placeholder="Search Content Types"
             onChangeText={(ingredientsInput) => this.setState({ ingredientsInput })}
             value={this.state.ingredientsInput}
           />
           <TouchableHighlight style={styles.searchButton} onPress={() => this.searchPressed()}>
-            <Text>Fetch Content Types</Text>
+            <Text style={styles.searchButtonText}>Search</Text>
           </TouchableHighlight>
         </View>
         <ScrollView style={styles.scrollSection} >
-          {!this.state.searching && this.recipes().map((recipe, index) => {
+          {!this.state.searching && this.contentTypes().map((recipe, index) => {
             return <TouchableHighlight key={"content-type-" + index}
               style={styles.searchButton}
               onPress={() => this.props.navigate({ key: 'Detail', id: recipe.id })}>
-              <View>
+              <View style={appStyle.contentTypes}>
                 <Text style={appStyle.resultText} >{recipe.name}</Text>
               </View>
             </TouchableHighlight>
@@ -66,20 +66,24 @@ const styles = StyleSheet.create({
     marginTop: 20
   },
   searchSection: {
-    height: 30,
+    height: 50,
     flexDirection: 'row',
     borderBottomColor: '#000',
     borderBottomWidth: 1,
-    padding: 5,
+    padding: 5
   },
   scrollSection: {
     flex: 0.8
   },
   searchButton: {
-    flex: 0.3,
+    flex: 0.2,
+    height: 32
+  },
+  searchButtonText: {
+    padding: 5
   },
   searchInput: {
-    flex: 0.7,
+    flex: 0.8
   },
 });
 
