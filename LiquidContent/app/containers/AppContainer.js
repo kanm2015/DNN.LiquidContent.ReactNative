@@ -10,7 +10,6 @@ import {
   NavigationExperimental
 } from 'react-native';
 import Home from './Home';
-import Detail from './Detail';
 
 class AppContainer extends Component {
 

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import ReactNative from 'react-native';
 import { appStyle } from '../styles';
+import MapView from 'react-native-maps';
 const {
   ScrollView,
   View,
@@ -15,13 +16,23 @@ const {
 class Home extends Component {
   constructor(props) {
     super(props)
-    this.state = { searching: false, ingredientsInput: '' }
+    this.state = { 
+      searching: false, 
+      ingredientsInput: '',
+      points: []
+    }
   }
 
   searchPressed() {
     this.setState({ searching: true })
     this.props.getContentTypes(this.state.ingredientsInput).then((res) => {
       this.setState({ searching: false })
+    });
+  }
+
+  categoryPressed(id) {
+    this.props.getContentItems(id).then((res) => {
+      
     });
   }
 
@@ -44,16 +55,33 @@ class Home extends Component {
           </TouchableHighlight>
         </View>
         <ScrollView style={styles.scrollSection} >
-          {!this.state.searching && this.contentTypes().map((recipe, index) => {
+          {!this.state.searching && this.contentTypes().map((type, index) => {
             return <TouchableHighlight key={"content-type-" + index}
               style={styles.searchButton}
-              onPress={() => this.props.navigate({ key: 'Detail', id: recipe.id })}>
+              onPress={() => this.categoryPressed(type.id)}>
               <View style={appStyle.contentTypes}>
-                <Text style={appStyle.resultText} >{recipe.name}</Text>
+                <Text style={appStyle.resultText} >{type.name}</Text>
               </View>
             </TouchableHighlight>
           })}
           {this.state.searching ? <Text>Searching...</Text> : null}
+          {this.props.contentTypes.length > 0 && <MapView
+            style={styles.map}
+            region={{
+              latitude: 37.78825,
+              longitude: -122.4324,
+              latitudeDelta: 0.02,
+              longitudeDelta: 0.02,
+            }}
+          >{this.props.contentItems.length> 0 && this.props.contentItems.map((item, index) => {
+            return <MapView.Marker key={"item-" + index}
+              coordinate={item.coordinate}
+              title={item.title}
+              description={item.desc}
+            />
+          })}
+          </MapView>
+          }
         </ScrollView>
       </View>
     )
@@ -65,6 +93,10 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 20
   },
+  map: {
+    height: 440,
+    marginTop: 10
+  },
   searchSection: {
     height: 50,
     flexDirection: 'row',
@@ -73,7 +105,7 @@ const styles = StyleSheet.create({
     padding: 5
   },
   scrollSection: {
-    flex: 0.8
+    flex: 0.3
   },
   searchButton: {
     flex: 0.2,
@@ -89,7 +121,8 @@ const styles = StyleSheet.create({
 
 function mapStateToProps(state) {
   return {
-    contentTypes: state.contentTypes
+    contentTypes: state.contentTypes,
+    contentItems: state.contentItems
   };
 }
 

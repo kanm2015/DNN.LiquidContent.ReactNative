@@ -7,3 +7,10 @@ export const contentTypes = createReducer({}, {
   }
 });
 
+export const contentItems = createReducer({}, {
+  [types.RETRIEVED_CONTENT_ITEMS](state, action) {
+    return action.contentItems;
+  }
+});
+
+
