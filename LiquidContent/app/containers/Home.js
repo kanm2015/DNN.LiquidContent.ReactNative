@@ -11,15 +11,15 @@ const {
   Text,
   TouchableHighlight,
   StyleSheet,
+  Button
 } = ReactNative;
 
 class Home extends Component {
   constructor(props) {
     super(props)
-    this.state = { 
-      searching: false, 
-      ingredientsInput: '',
-      points: []
+    this.state = {
+      searching: false,
+      ingredientsInput: ''
     }
   }
 
@@ -32,7 +32,6 @@ class Home extends Component {
 
   categoryPressed(id) {
     this.props.getContentItems(id).then((res) => {
-      
     });
   }
 
@@ -42,82 +41,52 @@ class Home extends Component {
 
   render() {
     return (
-      <View style={styles.scene}>
-        <View style={styles.searchSection}>
-          <TextInput style={styles.searchInput}
+      <View style={appStyle.scene}>
+        <View style={appStyle.searchSection}>
+          <TextInput style={appStyle.searchInput}
             returnKeyType="search"
-            placeholder="Search Content Types"
+            placeholder="my location"
             onChangeText={(ingredientsInput) => this.setState({ ingredientsInput })}
             value={this.state.ingredientsInput}
           />
-          <TouchableHighlight style={styles.searchButton} onPress={() => this.searchPressed()}>
-            <Text style={styles.searchButtonText}>Search</Text>
-          </TouchableHighlight>
+          <Button
+            onPress={() => this.searchPressed()}
+            title="Load Geolocation Groups"
+          />
         </View>
-        <ScrollView style={styles.scrollSection} >
+        <ScrollView style={appStyle.scrollSection} >
           {!this.state.searching && this.contentTypes().map((type, index) => {
-            return <TouchableHighlight key={"content-type-" + index}
-              style={styles.searchButton}
+            return <TouchableHighlight key={"group-" + index}
+              style={appStyle.searchButton}
               onPress={() => this.categoryPressed(type.id)}>
               <View style={appStyle.contentTypes}>
                 <Text style={appStyle.resultText} >{type.name}</Text>
               </View>
             </TouchableHighlight>
           })}
-          {this.state.searching ? <Text>Searching...</Text> : null}
-          {this.props.contentTypes.length > 0 && <MapView
-            style={styles.map}
+          {this.state.searching ? <Text style={appStyle.loading}>Loading...</Text> : null}         
+        </ScrollView>
+         {this.props.contentItems.length > 0 && <MapView
+            style={appStyle.map}
             region={{
-              latitude: 37.78825,
-              longitude: -122.4324,
+              latitude: parseFloat(this.props.contentItems[0].details.latitude),
+              longitude: parseFloat(this.props.contentItems[0].details.longitude),
               latitudeDelta: 0.02,
               longitudeDelta: 0.02,
             }}
-          >{this.props.contentItems.length> 0 && this.props.contentItems.map((item, index) => {
-            return <MapView.Marker key={"item-" + index}
-              coordinate={item.coordinate}
-              title={item.title}
-              description={item.desc}
+          >{this.props.contentItems.length > 0 && this.props.contentItems.map((item, index) => {
+            return <MapView.Marker key={"point-" + index}
+              coordinate={{ latitude: parseFloat(item.details.latitude), longitude: parseFloat(item.details.longitude) }}
+              title={item.details.name}
+              description={item.details.description}
             />
           })}
           </MapView>
           }
-        </ScrollView>
       </View>
     )
   }
 }
-
-const styles = StyleSheet.create({
-  scene: {
-    flex: 1,
-    marginTop: 20
-  },
-  map: {
-    height: 440,
-    marginTop: 10
-  },
-  searchSection: {
-    height: 50,
-    flexDirection: 'row',
-    borderBottomColor: '#000',
-    borderBottomWidth: 1,
-    padding: 5
-  },
-  scrollSection: {
-    flex: 0.3
-  },
-  searchButton: {
-    flex: 0.2,
-    height: 32
-  },
-  searchButtonText: {
-    padding: 5
-  },
-  searchInput: {
-    flex: 0.8
-  },
-});
 
 function mapStateToProps(state) {
   return {
